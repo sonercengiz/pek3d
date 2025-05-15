@@ -1,15 +1,11 @@
 import React from 'react'
-import SideItemMenu from '../../../@core/components/side-item-menu/SideItemMenu'
+import { SideItemMenu } from '@wi3n/core'
 import MenuContent from './MenuContent'
 
 const menuContents = [
   {
     title: "Sahne",
-    content: <MenuContent />
-  },
-  {
-    title: "Sahne",
-    content: <MenuContent />
+    content: <></>
   }
 ]
 const SideMenu = () => {

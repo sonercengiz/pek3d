@@ -1,20 +1,15 @@
 import React from 'react'
 import { Canvas } from '@react-three/fiber'
 import { GizmoHelper, GizmoViewport, OrbitControls, PerspectiveCamera, Stats } from '@react-three/drei'
-import GridWithLabels from '../@core/components/grid-with-labels'
+import { GridWithLabels } from '@wi3n/core'
 
 // Zustand stores
-import { useCameraStorage } from '../@core/storage/CameraStorage'
-import { useControlsStorage } from '../@core/storage/ControlsStorage'
-import { useEnvironmentStorage } from '../@core/storage/EnvironmentStorage'
-import { useModelsStorage } from '../@core/storage/ModelsStorage'
-import { useSelectionStorage } from '../@core/storage/SelectionStorage'
-import { useHistoryStorage } from '../@core/storage/HistoryStorage'
-import Grid3DLines from '../components/r3f-components/Grid3DLines'
-import CubeGridWithLabels from '../@core/components/cube-grid-with-labels'
-import TestModel from '../models/TestModel'
-import TestModel2 from '../models/TestModel2'
-import { Perf } from 'r3f-perf'
+import { useCameraStorage } from '@wi3n/core'
+import { useControlsStorage } from '@wi3n/core'
+import { useEnvironmentStorage } from '@wi3n/core'
+import { useModelsStorage } from '@wi3n/core'
+import { useSelectionStorage } from '@wi3n/core'
+import { useHistoryStorage } from '@wi3n/core'
 
 /**
  * ConfigurationScene
@@ -53,7 +48,6 @@ export default function ConfigurationScene({ children }) {
   return (
     <Canvas>
       {/* fps */}
-      <Perf position='top-right' style={{ zIndex: 1 }} />
       {/* <Stats /> */}
 
 
@@ -94,15 +88,8 @@ export default function ConfigurationScene({ children }) {
 
 
       {/* Izgara */}
-      {/* <CubeGridWithLabels size={20.3} divisions={20.3} fontSize={0.3}/> */}
       <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 0, 0]} gridColor='gray' />
-      {/* <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0,2,0]} gridColor='white'/> */}
-      {/* <Grid3DLines
-        size={10}        // grid genişliği
-        divisions={20}   // bölüm sayısı
-        position={[0, 0, 0]} // yer kaydırma
-        color="white"    // çizgi rengi
-      /> */}
+
 
 
       {/* Kontroller */}

@@ -1,6 +1,6 @@
 import { Box, CircularProgress, Paper, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import ModelPreview from '../../../@core/components/model-preview/ModelPreview'
+import { ModelPreview } from '@wi3n/core'
 import { MODELS_BASE_PATH } from '../../../utils/api';
 import { getComponentList } from '../../../services/ComponentService';
 

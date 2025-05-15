@@ -1,45 +1,53 @@
-import { Text } from '@react-three/drei'
 import React from 'react'
+import { Text } from '@react-three/drei'
+import type { Vector3 } from 'three'
 
-/**
- * GridWithLabels
- * - Three orthogonal grids (ground, side, front) meeting at the (size,size) corner.
- * - Labels on X & Z axes along the bottom and left edges.
- */
-const CubeGridWithLabels = ({
+export interface CubeGridWithLabelsProps {
+  /** Total size of each grid plane */
+  size?: number
+  /** Number of divisions per grid */
+  divisions?: number
+  /** Offset distance for labels */
+  labelOffset?: number
+  /** Font size for axis labels */
+  fontSize?: number
+  /** Color of the label text */
+  textColor?: string
+}
+
+const CubeGridWithLabels: React.FC<CubeGridWithLabelsProps> = ({
   size = 20,
   divisions = 20,
   labelOffset = 0.5,
   fontSize = 0.5,
   textColor = 'gray',
-  gridColor = 'gray',
 }) => {
   const step = size / divisions
   const half = size / 2
 
   return (
     <>
-      {/* Ground plane (XZ) shifted so corner is at (size,0,size) */}
+      {/* Ground plane (XZ) at origin */}
       <gridHelper
-        args={[size, divisions, "red", "red"]}
+        args={[size, divisions, 'red', 'red']}
         position={[0, 0, 0]}
       />
 
-      {/* Side plane (YZ) rotated and shifted so corner is at (size,size,size?) Actually at (size,half,half) */}
+      {/* Side plane (YZ), rotated to face X axis */}
       <gridHelper
-        args={[size, divisions, "blue", "blue"]}
+        args={[size, divisions, 'blue', 'blue']}
         rotation={[0, 0, Math.PI / 2]}
         position={[-half, half, 0]}
       />
 
-      {/* Front plane (XY) rotated and shifted so corner is at (half,size,half) */}
+      {/* Front plane (XY), rotated to face Z axis */}
       <gridHelper
-        args={[size, divisions, "green", "green"]}
+        args={[size, divisions, 'green', 'green']}
         rotation={[Math.PI / 2, 0, 0]}
         position={[0, half, -half]}
       />
 
-      {/* X-axis labels along Z=0 edge from (0,0) to (size,0) */}
+      {/* X-axis labels along Z=0 edge */}
       {Array.from({ length: divisions + 1 }, (_, i) => {
         const x = i * step
         return (
@@ -57,7 +65,7 @@ const CubeGridWithLabels = ({
         )
       })}
 
-      {/* Z-axis labels along X=0 edge from (0,0) to (0,size) */}
+      {/* Z-axis labels along X=0 edge */}
       {Array.from({ length: divisions + 1 }, (_, i) => {
         const z = i * step
         return (
