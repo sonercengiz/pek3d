@@ -52,7 +52,7 @@ const SideItemMenu: FC<SideItemMenuProps> = ({ menuContents }) => {
         borderRadius: 4,
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '96vh',
+        height: '96vh',
       }}
     >
       <TabContext value={value}>
@@ -61,7 +61,7 @@ const SideItemMenu: FC<SideItemMenuProps> = ({ menuContents }) => {
           variant={tabsVariant}
           scrollButtons={'auto'}
           allowScrollButtonsMobile
-          
+
           slotProps={{
             startScrollButtonIcon: {
               sx: {
@@ -91,6 +91,9 @@ const SideItemMenu: FC<SideItemMenuProps> = ({ menuContents }) => {
               key={idx}
               label={menu.title}
               value={idx.toString()}
+              sx={{
+                m: 0,
+              }}
             />
           ))}
         </TabList>
@@ -100,7 +103,11 @@ const SideItemMenu: FC<SideItemMenuProps> = ({ menuContents }) => {
           <TabPanel
             key={idx}
             value={idx.toString()}
-            sx={{ flex: 1, p: 0 }}
+            sx={{
+              flex: 1, p: 0, overflowY: 'auto',
+              userSelect: 'none',
+              scrollbarWidth: 'none',
+            }}
           >
             {menu.content}
           </TabPanel>

@@ -12,6 +12,9 @@ import { useSelectionStorage } from '../@core/storage/SelectionStorage'
 import { useHistoryStorage } from '../@core/storage/HistoryStorage'
 import Grid3DLines from '../components/r3f-components/Grid3DLines'
 import CubeGridWithLabels from '../@core/components/cube-grid-with-labels'
+import TestModel from '../models/TestModel'
+import TestModel2 from '../models/TestModel2'
+import { Perf } from 'r3f-perf'
 
 /**
  * ConfigurationScene
@@ -50,7 +53,8 @@ export default function ConfigurationScene({ children }) {
   return (
     <Canvas>
       {/* fps */}
-      {/* <Stats/> */}
+      <Perf position='top-right' style={{ zIndex: 1 }} />
+      {/* <Stats /> */}
 
 
       {/* Environment */}
@@ -68,7 +72,10 @@ export default function ConfigurationScene({ children }) {
 
 
       {/* light */}
-      <directionalLight position={[0,5,5]} intensity={1}/>
+      <directionalLight position={[0, 5, 5]} intensity={2} castShadow={false} />
+      <directionalLight position={[5, 5, 0]} intensity={2} castShadow={false} />
+      <directionalLight position={[-5, 5, 0]} intensity={2} castShadow={false} />
+      <directionalLight position={[0, 5, -5]} intensity={2} castShadow={false} />
 
 
       {/* Modeller */}
@@ -88,7 +95,7 @@ export default function ConfigurationScene({ children }) {
 
       {/* Izgara */}
       {/* <CubeGridWithLabels size={20.3} divisions={20.3} fontSize={0.3}/> */}
-      <GridWithLabels size={5.5} divisions={5.5} fontSize={0.3} position={[0,0,0]} gridColor='gray'/>
+      <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 0, 0]} gridColor='gray' />
       {/* <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0,2,0]} gridColor='white'/> */}
       {/* <Grid3DLines
         size={10}        // grid genişliği
@@ -116,6 +123,9 @@ export default function ConfigurationScene({ children }) {
       <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
         <GizmoViewport />
       </GizmoHelper>
+
+      {/* <TestModel position={[0, 10, 0]} /> */}
+      {/* <TestModel2 /> */}
 
 
     </Canvas>

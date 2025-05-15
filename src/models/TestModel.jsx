@@ -1,13 +1,31 @@
+import React, { useEffect, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
-import React from 'react'
+import * as THREE from 'three'
 
-const TestModel = () => {
-  const { scene  } = useGLTF('/models/Yerden Hamur Besleme Sistemi.glb')
+export default function TestModel() {
+  const { scene } = useGLTF('/models/mikser.glb')
+  const ref = useRef()
+
+  useEffect(() => {
+    scene.traverse((child) => {
+      if (child.isMesh) {
+
+        child.material = new THREE.MeshStandardMaterial({
+          color: '#525252',
+          flatShading: true,
+        })
+
+        child.castShadow = true
+        child.receiveShadow = true
+      }
+    })
+  }, [scene])
+
   return (
-    <>
-      <primitive object={scene} scale={0.001}/>
-    </>
+    <primitive
+      ref={ref}
+      object={scene}
+      scale={0.001}
+    />
   )
 }
-
-export default TestModel
