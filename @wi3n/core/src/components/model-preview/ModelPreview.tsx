@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState, Suspense } from 'react'
-import { useGLTF, useProgress, Html } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
+import React, { Suspense, useEffect, useRef, ReactNode } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { Html, useGLTF, useProgress, OrbitControls } from '@react-three/drei'
 import { Typography } from '@mui/material'
 import * as THREE from 'three'
-import { useModelPreview } from './ModelPreviewProvider'
 
 interface SpinningModelProps {
   modelPath: string
@@ -19,9 +18,10 @@ const SpinningModel: React.FC<SpinningModelProps> = ({
   onLoad = () => { },
 }) => {
   const group = useRef<THREE.Group>(null)
-  const { scene } = useGLTF(modelPath)
+  const { scene } = useGLTF(modelPath) as { scene: THREE.Group }
 
   useEffect(() => {
+    // Remove UV maps and apply dark gray material
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.geometry.deleteAttribute('uv')
@@ -42,6 +42,7 @@ const SpinningModel: React.FC<SpinningModelProps> = ({
   return <primitive ref={group} object={scene} scale={scale} />
 }
 
+
 interface ModelPreviewProps {
   modelPath: string
   scale?: number | [number, number, number]
@@ -52,7 +53,7 @@ interface ModelPreviewProps {
   backgroundColor?: string
   lightPosition?: [number, number, number]
   lightIntensity?: number
-  fallback?: React.ReactNode
+  fallback?: ReactNode
 }
 
 const ModelPreview: React.FC<ModelPreviewProps> = ({
@@ -67,23 +68,11 @@ const ModelPreview: React.FC<ModelPreviewProps> = ({
   lightIntensity = 2,
   fallback,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const { registerViewport, unregisterViewport } = useModelPreview()
-  const [viewportId] = useState(() => `model-preview-${Math.random().toString(36).substr(2, 9)}`)
-  const { progress } = useProgress()
-
-  useEffect(() => {
-    const ref = containerRef.current
-    if (ref) {
-      registerViewport(viewportId, { current: ref })
-    }
-    return () => unregisterViewport(viewportId)
-  }, [viewportId, registerViewport, unregisterViewport])
-
   useEffect(() => {
     useGLTF.preload(modelPath)
   }, [modelPath])
 
+  const { progress } = useProgress()
   const loadingScreen = (
     <Html center>
       <Typography variant="subtitle1" fontSize={14} color="white">
@@ -93,24 +82,23 @@ const ModelPreview: React.FC<ModelPreviewProps> = ({
   )
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-        backgroundColor
-      }}
+    <Canvas
+      camera={{ position: cameraPosition, fov }}
     >
+      <ambientLight intensity={0.5} />
+      <directionalLight position={lightPosition} intensity={lightIntensity} />
+      <color attach="background" args={[backgroundColor]} />
+      <gridHelper args={[10, 10]} position={[0, 0, 0]} />
       <Suspense fallback={fallback || loadingScreen}>
         <SpinningModel
           modelPath={modelPath}
           scale={scale}
           spinSpeed={spinSpeed}
-          onLoad={() => console.log('Model loaded')}
+          onLoad={() => console.log('onLoad callback')}
         />
       </Suspense>
-    </div>
+      <OrbitControls enablePan={false} enableRotate={false} enableZoom={false} target={targetPosition} />
+    </Canvas>
   )
 }
 
