@@ -1,50 +1,78 @@
 // src/store/ModelsStorage.js
 import { create } from 'zustand'
+import { v4 as uuidv4 } from 'uuid'
 
-export const useModelsStorage = create((set) => ({
-  // Sahnedeki modelleri tutan dizi
-  // her bir model: { id, name, path, children: Array<{id, name}> }
-  models: [],
+export const useModelsStorage = create((set, get) => ({
+  // --- State ---
+  models: [],               // { id, name, path, instanceId, children: [], selected: bool }
+  selectedId: null,         // seçili modelin instanceId’si
 
-  // Yeni bir model ekle
-  addModel: (model) =>
-    set((state) => ({
-      models: [
-        ...state.models,
-        {
-          ...model,
-          children: []    // ilk başta alt öğe yok
-        }
-      ]
-    })),
+  // --- Selector ---
+  getSelectedModel: () => {
+    const { models, selectedId } = get()
+    return models.find(m => m.instanceId === selectedId) || null
+  },
 
-  // Bir modelin alt öğe listesini güncelle
-  updateModelChildren: (id, children) =>
-    set((state) => ({
-      models: state.models.map((m) =>
-        m.id === id
+  // --- Actions ---
+  addModel: (model, selectNew = false) => {
+    const instanceId = uuidv4()
+    set(state => {
+      // tüm eski seçimleri kaldır
+      const cleared = state.models.map(m => ({ ...m, selected: false }))
+      const newEntry = {
+        ...model,
+        instanceId,
+        children: [],       // başlangıçta alt öğe yok
+        selected: selectNew
+      }
+      return {
+        models: [...cleared, newEntry],
+        selectedId: selectNew ? instanceId : state.selectedId
+      }
+    })
+    return instanceId
+  },
+
+  updateModelChildren: (instanceId, children) => {
+    set(state => ({
+      models: state.models.map(m =>
+        m.instanceId === instanceId
           ? { ...m, children }
           : m
       )
-    })),
+    }))
+  },
 
-  // Bir modeli id’sine göre kaldır
-  removeModel: (id) =>
-    set((state) => ({
-      models: state.models.filter((m) => m.id !== id),
-      // eğer silinen seçili modelse, seçimi temizle
-      selectedId: state.selectedId === id ? null : state.selectedId
-    })),
+  removeModel: (instanceId) => {
+    set(state => ({
+      models: state.models.filter(m => m.instanceId !== instanceId),
+      selectedId: state.selectedId === instanceId ? null : state.selectedId
+    }))
+  },
 
-  // Tüm modelleri temizle
-  clearModels: () =>
-    set({
-      models: []
-    }),
+  clearModels: () => {
+    set({ models: [], selectedId: null })
+  },
 
-  // Toplu set etme fonksiyonu
-  setModels: (newModels) =>
-    set({
-      models: newModels
-    }),
+  setModels: (newModels) => {
+    set({ models: newModels.map(m => ({ ...m, selected: false })), selectedId: null })
+  },
+
+  // --- Selection ---
+  select: (instanceId) => {
+    set(state => ({
+      selectedId: instanceId,
+      models: state.models.map(m => ({
+        ...m,
+        selected: m.instanceId === instanceId
+      }))
+    }))
+  },
+
+  clearSelection: () => {
+    set(state => ({
+      selectedId: null,
+      models: state.models.map(m => ({ ...m, selected: false }))
+    }))
+  }
 }))

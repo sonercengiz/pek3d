@@ -3,11 +3,11 @@ import React, { useState } from 'react'
 import AddIcon from '@mui/icons-material/Add'
 import SettingsIcon from '@mui/icons-material/Settings'
 import CameraOutdoorIcon from '@mui/icons-material/CameraOutdoor'
-import { Toolbar } from '@wi3n/core'
+import { Toolbar, useModelsStorage } from '@wi3n/core'
 import CustomPopup from '../CustomPopup'
 import SettingsSection from './SettingsSection'
 import AddComponentSection from '../add-component-section'
-import { useCameraStorage, useSelectionStorage } from '@wi3n/core'
+import { useCameraStorage } from '@wi3n/core'
 
 export default function TopToolbar() {
   const [openAdd, setOpenAdd] = useState(false)
@@ -18,7 +18,7 @@ export default function TopToolbar() {
   const setTar = useCameraStorage(s => s.setCameraTarget)
   const setZoom = useCameraStorage(s => s.setCameraZoom)
   // clear selection
-  const clearSel = useSelectionStorage(s => s.clearSelection)
+  const clearSel = useModelsStorage(s => s.clearSelection)
 
   const initialPos = [0, 10, 10]
   const initialTar = [0, 0, 0]

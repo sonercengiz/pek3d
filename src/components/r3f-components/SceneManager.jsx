@@ -3,11 +3,10 @@ import React, { useEffect, useRef } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import * as THREE from 'three'
-import { useModelsStorage, useSelectionStorage } from '@wi3n/core'
+import { useModelsStorage } from '@wi3n/core'
 
 export function SceneManager({ focusDuration = 1 }) {
-  const { models, updateModelChildren } = useModelsStorage()
-  const selectedId = useSelectionStorage(s => s.selectedId)
+  const { models, updateModelChildren, selectedId } = useModelsStorage()
   const { scene, camera } = useThree()
   const controls = useThree(state => state.controls)
 
@@ -24,25 +23,29 @@ export function SceneManager({ focusDuration = 1 }) {
   useEffect(() => {
     const loader = new GLTFLoader()
     models.forEach(m => {
-      if (added.current.has(m.id)) return
-      added.current.add(m.id)
+      if (added.current.has(m.instanceId)) return
+      added.current.add(m.instanceId)
       loader.load(m.path, gltf => {
         const root = gltf.scene.clone(true)
-        root.name = m.id.toString()
+        root.name = m.instanceId
         // *** burası önemli ***
-        root.userData.isModelRoot = true
-        root.userData.modelId = m.id
+        root.userData = {
+          isModelRoot: true,
+          modelId: m.id,
+          instanceId: m.instanceId,
+          modelName: m.name,
+        }
 
         scene.add(root)
         // eğer halihazırda seçili ise focus da hazırla
         const ch = root.children?.map(c => ({ id: c.uuid, name: c.name || c.type }))
-        updateModelChildren(m.id, ch)
-        if (useSelectionStorage.getState().selectedId === m.id) {
+        updateModelChildren(m.instanceId, ch)
+        if (useModelsStorage.getState().selectedId === m.instanceId) {
           startFocus(root)
         }
       })
     })
-    console.log('models', models)
+    console.log(1);
   }, [models, scene])
 
   // selectedId değiştiğinde focus başlat
@@ -53,16 +56,35 @@ export function SceneManager({ focusDuration = 1 }) {
   }, [selectedId, scene])
 
   function startFocus(obj) {
+    // 1) Model’in bounding sphere’ünü al
     const box = new THREE.Box3().setFromObject(obj)
     const sph = box.getBoundingSphere(new THREE.Sphere())
+
+    // 2) Mevcut kamera/hedef pozisyonunu sakla
     anim.startPos.copy(camera.position)
     anim.startTarget.copy(controls.target)
+
+    // 3) Yeni hedef noktayı model merkezine kaydır
     anim.endTarget.copy(sph.center)
+
+    // 4) Kameranın mevcut baktığı yönden birim vektör al
+    const currentDir = new THREE.Vector3()
+      .subVectors(camera.position, controls.target)
+      .normalize()
+
+    // 5) Gerekli mesafeyi hesapla
     const fov = THREE.MathUtils.degToRad(camera.fov)
-    const dist = sph.radius / Math.sin(fov / 2) * 1.2
-    anim.endPos.set(sph.center.x, sph.center.y, sph.center.z + dist)
+    const distance = sph.radius / Math.sin(fov / 2) * 1.2
+
+    // 6) Son kamera pozisyonunu, model merkezinden bu yönde uzaklaştırarak ayarla
+    anim.endPos
+      .copy(sph.center)
+      .add(currentDir.multiplyScalar(distance))
+
+    // 7) Animasyon kronometresini başa sar
     anim.t = 0
   }
+
 
   // frame’de interpolate
   useFrame((_, delta) => {

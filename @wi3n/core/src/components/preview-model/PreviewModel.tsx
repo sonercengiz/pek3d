@@ -56,7 +56,7 @@ export const PreviewModel: React.FC<PreviewModelProps> = ({
           const sphere = bbox.getBoundingSphere(new THREE.Sphere())
           const fovRad = THREE.MathUtils.degToRad(camera.fov)
           const dist = (sphere.radius / Math.sin(fovRad / 2)) * 1.2
-          camera.position.set(0, 0, dist)
+          camera.position.set(center.x, center.y, center.z + dist)
           camera.lookAt(0, 0, 0)
           camera.updateProjectionMatrix()
 

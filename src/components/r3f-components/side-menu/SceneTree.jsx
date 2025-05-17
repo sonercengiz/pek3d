@@ -5,56 +5,40 @@ import WidgetsIcon from '@mui/icons-material/Widgets'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useModelsStorage } from '@wi3n/core'
-import { useSelectionStorage } from '@wi3n/core'
 
 export default function SceneTree() {
   const models = useModelsStorage(s => s.models)
-  const select = useSelectionStorage(s => s.select)
-  const selected = useSelectionStorage(s => s.selectedId)
+  const select = useModelsStorage(s => s.select)
+  const selectedId = useModelsStorage(s => s.selectedId)
 
-  // models içinde children yoksa boş array veriyoruz
   const items = useMemo(() => models.map(m => ({
-    id: m.id.toString(),
+    id: m.instanceId,
     label: m.name,
-    // eğer child geometry’leriniz varsa burada map edin:
-    children: (m.children || []).map(ch => ({
-      id: ch.id.toString(),
-      label: ch.name,
-    }))
-  })), [models])
+    icon: WidgetsIcon,              // **component** olarak veriyoruz
+    // children: (m.children || []).map(ch => ({
+    //   id: ch.id.toString(),
+    //   label: ch.name,
+    //   icon: WidgetsIcon,            // istersen farklı ikon
+    // }))
+  })), [models, selectedId])
 
   return (
     <RichTreeView
       items={items}
-
-      // İkonlarımızı slots içinde tanımlıyoruz
+      selectedItems={selectedId ? [selectedId.toString()] : []}
+      onSelectedItemsChange={(_, val) => {
+        const idStr = Array.isArray(val) ? val[0] : val
+        // modelId olarak number saklıyoruz
+        select(idStr)
+      }}
       slots={{
         expandIcon: ChevronRightIcon,
         collapseIcon: ExpandMoreIcon,
       }}
-      // Yaprak (leaf) öğeler için ikon
-      defaultEndIcon={<WidgetsIcon fontSize="small" />}
-
-      // Seçili öğe kontrolü
-      selectedItems={selected != null ? [selected.toString()] : []}
-      onSelectedItemsChange={(_, val) => {
-        const idStr = Array.isArray(val) ? val[0] : val
-        select(Number(idStr))
-      }}
-
-      // Stil ayarları
-      slotProps={{
-        root: {
-          sx: {
-            height: '100%',
-            overflowY: 'auto',
-            // metin renkleri
-            '& .MuiTreeItem-label': { color: 'white' },
-            '& .MuiTreeItem-content.Mui-selected > .MuiTreeItem-label': {
-              fontWeight: 'bold'
-            }
-          }
-        }
+      sx={{
+        height: '100%',
+        '& .MuiTreeItem-label': { color: 'white' },
+        '& .Mui-selected > .MuiTreeItem-label': { fontWeight: 'bold' },
       }}
     />
   )

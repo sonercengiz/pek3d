@@ -2,43 +2,70 @@
 import { useEffect, useRef } from 'react'
 import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { useSelectionStorage } from '@wi3n/core'
+import { useModelsStorage } from '@wi3n/core'
 
-export default function SelectionHandler() {
-  const select = useSelectionStorage(s => s.select)
-  const clear = useSelectionStorage(s => s.clearSelection)
+export default function SelectionHandler({ clearOnEmpty = true }) {
+  const select = useModelsStorage(s => s.select)
+  const clearSelection = useModelsStorage(s => s.clearSelection)
   const { gl, scene, camera } = useThree()
   const raycaster = useRef(new THREE.Raycaster())
+  // fare basma pozisyonunu saklayacağız
+  const downPos = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
-    const handleClick = (event) => {
-      // normalize mouse coords to [-1,1]
-      const rect = gl.domElement.getBoundingClientRect()
-      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-      const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+    const canvas = gl.domElement
 
+    // 1) Mousedown'da pozisyonu al (sadece sol tuş)
+    const handleMouseDown = (event) => {
+      if (event.button !== 0) return
+      downPos.current = { x: event.clientX, y: event.clientY }
+    }
+
+    // 2) Mouseup'da aradaki mesafe < eşik ise gerçekten click say
+    const handleMouseUp = (event) => {
+      if (event.button !== 0) return
+      const dx = event.clientX - downPos.current.x
+      const dy = event.clientY - downPos.current.y
+      const dist2 = dx * dx + dy * dy
+      const CLICK_THRESHOLD = 5 // px cinsinden izin verilen hareket miktarı
+
+      if (dist2 > CLICK_THRESHOLD * CLICK_THRESHOLD) {
+        // sürükleme; ignore
+        return
+      }
+
+      // gerçek bir tıklama
+      // normalize mouse coords
+      const { left, top, width, height } = canvas.getBoundingClientRect()
+      const x = ((event.clientX - left) / width) * 2 - 1
+      const y = -((event.clientY - top) / height) * 2 + 1
+
+      // raycast
       raycaster.current.setFromCamera({ x, y }, camera)
-      const intersects = raycaster.current.intersectObjects(scene.children, true)
-
-      if (intersects.length > 0) {
-        // ilk intersect edilen mesh
-        let obj = intersects[0].object
-        // root group'u bul (name atadığımız m.id burada)
-        while (obj && !obj.name) obj = obj.parent
-        if (obj && obj.name) {
-          select(obj.name)
+      const hits = raycaster.current.intersectObjects(scene.children, true)
+      if (hits.length > 0) {
+        // en üst mesh'ten modelRoot'a tırman
+        let obj = hits[0].object
+        while (obj && !obj.userData.isModelRoot) {
+          obj = obj.parent
+        }
+        if (obj && obj.userData.isModelRoot) {
+          select(obj.userData.instanceId || obj.name)
           return
         }
       }
-      // sahnenin boş bir yerine tıklanmışsa seçimi temizle
-      clear()
+
+      // boş alana tıklanırsa
+      if (clearOnEmpty) clearSelection()
     }
 
-    gl.domElement.addEventListener('pointerdown', handleClick)
+    canvas.addEventListener('mousedown', handleMouseDown)
+    canvas.addEventListener('mouseup', handleMouseUp)
     return () => {
-      gl.domElement.removeEventListener('pointerdown', handleClick)
+      canvas.removeEventListener('mousedown', handleMouseDown)
+      canvas.removeEventListener('mouseup', handleMouseUp)
     }
-  }, [gl, scene, camera, select, clear])
+  }, [gl.domElement, camera, scene, select, clearSelection, clearOnEmpty])
 
   return null
 }

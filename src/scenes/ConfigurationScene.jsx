@@ -4,24 +4,25 @@ import { Canvas } from '@react-three/fiber'
 import {
   GizmoHelper,
   GizmoViewport,
+  MeshReflectorMaterial,
   OrbitControls,
-  PerspectiveCamera
+  PerspectiveCamera,
+  Stats
 } from '@react-three/drei'
 import { GridWithLabels, useModelsStorage } from '@wi3n/core'
-import { useCameraStorage, useControlsStorage, useEnvironmentStorage, useHistoryStorage, useSelectionStorage } from '@wi3n/core'
+import { useCameraStorage, useControlsStorage, useEnvironmentStorage, useHistoryStorage } from '@wi3n/core'
 import SmoothSyncCamera from '../components/r3f-components/SmoothSyncCamera'
 import { SceneManager } from '../components/r3f-components/SceneManager'
-import Model from '../components/r3f-components/model/Model'
 import SelectionHandler from '../components/r3f-components/SelectionHandler'
 import SelectedHighlighter from '../components/r3f-components/SelectedHighlighter'
-import SelectedBoxHelper from '../components/r3f-components/SelectedBoxHelper'
+import { Floor } from '../components/r3f-components/Floor'
 
 export default function ConfigurationScene({ children }) {
   // initial camera
   const camPos = useCameraStorage(s => s.cameraPosition)
   const camTar = useCameraStorage(s => s.cameraTarget)
   const camZ = useCameraStorage(s => s.cameraZoom)
-  const clearSel = useSelectionStorage(s => s.clearSelection)
+  const clearSel = useModelsStorage(s => s.clearSelection)
 
   // controls settings
   const enablePan = useControlsStorage(s => s.enablePan)
@@ -46,7 +47,8 @@ export default function ConfigurationScene({ children }) {
   const redo = useHistoryStorage(s => s.redo)
 
   return (
-    <Canvas>
+    <Canvas performance={{ min: 0.1, max: 0.5 }} shadows>
+      <Stats />
       <color attach="background" args={[bgColor]} />
       {fogOn && <fog attach="fog" args={[fogColor, fogNear, fogFar]} />}
 
@@ -57,10 +59,10 @@ export default function ConfigurationScene({ children }) {
         onUpdate={cam => cam.lookAt(...camTar)}
       />
 
-      <directionalLight position={[0, 5, 5]} intensity={2} />
-      <directionalLight position={[5, 5, 0]} intensity={2} />
-      <directionalLight position={[-5, 5, 0]} intensity={2} />
-      <directionalLight position={[0, 5, -5]} intensity={2} />
+      <directionalLight position={[0, 5, 5]} intensity={5} />
+      <directionalLight position={[5, 5, 0]} intensity={5} />
+      <directionalLight position={[-5, 5, 0]} intensity={5} />
+      <directionalLight position={[0, 5, -5]} intensity={5} />
 
       <SceneManager focusDuration={0.8} />
 
@@ -81,12 +83,13 @@ export default function ConfigurationScene({ children }) {
 
       <SelectionHandler />
       <SelectedHighlighter />
-      <SelectedBoxHelper color={'yellow'} />
 
 
       {children}
 
-      < GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 0, 0]} gridColor="gray" />
+      {/* <Floor /> */}
+
+      <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 0.01, 0]} gridColor="black" textColor='black' />
       <GizmoHelper alignment="bottom-right" margin={[80, 80]}><GizmoViewport /></GizmoHelper>
     </Canvas>
   )

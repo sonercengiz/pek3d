@@ -2,12 +2,12 @@
 import React, { useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
-import { useSelectionStorage } from '@wi3n/core'
+import { useModelsStorage } from '@wi3n/core'
 
 export default function Model({ id, path, ...props }) {
   const { scene } = useGLTF(path)
-  const select = useSelectionStorage(s => s.select)
-  const selectedId = useSelectionStorage(s => s.selectedId)
+  const select = useModelsStorage(s => s.select)
+  const selectedId = useModelsStorage(s => s.selectedId)
 
   // bir kez clone et ve ismini ata
   const cloned = useMemo(() => {

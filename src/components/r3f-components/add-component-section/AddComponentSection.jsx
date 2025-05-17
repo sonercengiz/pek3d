@@ -8,7 +8,7 @@ import {
   CircularProgress,
   TextField
 } from '@mui/material'
-import { PreviewModelProvider, PreviewModel, useModelsStorage, useSelectionStorage } from '@wi3n/core'
+import { PreviewModelProvider, PreviewModel, useModelsStorage } from '@wi3n/core'
 import {
   boxContainer,
   searchField,
@@ -24,7 +24,6 @@ const AddComponentSection = ({ onClose }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const { addModel } = useModelsStorage()
-  const { select } = useSelectionStorage()
 
   useEffect(() => {
     getComponentList()
@@ -51,8 +50,7 @@ const AddComponentSection = ({ onClose }) => {
       path: `${MODELS_BASE_PATH}${component.path}`,
     }
 
-    addModel(componentModel)
-    select(componentModel.id)
+    addModel(componentModel, true)
     onClose?.()
   }
 
@@ -78,7 +76,6 @@ const AddComponentSection = ({ onClose }) => {
             <Grid container spacing={2} alignItems="stretch">
               {components.map(c => (
                 <Grid
-                  item
                   size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 3 }}
                   key={c.id}
                   onClick={() => handleClick(c.id)}
