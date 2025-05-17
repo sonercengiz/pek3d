@@ -7,6 +7,7 @@ import TopToolbar from '../components/r3f-components/top-toolbar/TopToolbar'
 const ConfigurationPage = () => {
     return (
         <Box sx={{ position: "relative", width: "100vw", height: "100vh" }}>
+
             <ConfigurationScene />
             <SideMenu />
             <TopToolbar />

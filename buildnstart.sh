@@ -1,0 +1,1 @@
+cd @wi3n/core && npm run build && npm link && cd ../.. && npm link @wi3n/core && npm run dev

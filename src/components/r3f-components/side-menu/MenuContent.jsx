@@ -1,6 +1,5 @@
 import { Box, CircularProgress, Paper, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { ModelPreview } from '@wi3n/core'
 import { MODELS_BASE_PATH } from '../../../utils/api';
 import { getComponentList } from '../../../services/ComponentService';
 
@@ -57,7 +56,7 @@ const MenuContent = () => {
               },
             }}
           >
-            <ModelPreview modelPath={`${MODELS_BASE_PATH}/${component.name}`} scale={0.001} targetPosition={[0, 0.7, 0]} backgroundColor='#cfcfcf' spinSpeed={0.3} />
+            {/* <ModelPreview modelPath={`${MODELS_BASE_PATH}/${component.name}`} scale={0.001} targetPosition={[0, 0.7, 0]} backgroundColor='#cfcfcf' spinSpeed={0.3} /> */}
 
             <Typography variant="subtitle" fontSize="14px">
               {component.name}

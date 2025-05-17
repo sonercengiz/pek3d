@@ -8,6 +8,7 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+
       <BrowserRouter basename="/">
         <Routes>
           <Route path="/" element={<ConfigurationPage />} />
