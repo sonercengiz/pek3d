@@ -1,11 +1,11 @@
 import React from 'react'
 import { SideItemMenu } from '@wi3n/core'
-import MenuContent from './MenuContent'
+import SceneTree from './SceneTree'
 
 const menuContents = [
   {
     title: "Sahne",
-    content: <></>
+    content: <><SceneTree /></>
   }
 ]
 const SideMenu = () => {
