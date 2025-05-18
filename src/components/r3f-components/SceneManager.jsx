@@ -28,6 +28,19 @@ export function SceneManager({ focusDuration = 1 }) {
       loader.load(m.path, gltf => {
         const root = gltf.scene.clone(true)
         root.name = m.instanceId
+
+        root.traverse(obj => {
+          if (obj.isMesh) {
+            obj.material = new THREE.MeshStandardMaterial({
+              color: 0x333333,      // koyu gri
+              metalness: 0.6,
+              roughness: 0.8
+            })
+            obj.castShadow = true
+            obj.receiveShadow = true
+          }
+        })
+
         // *** burası önemli ***
         root.userData = {
           isModelRoot: true,

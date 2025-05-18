@@ -14,7 +14,7 @@ export default function SceneTree() {
   const items = useMemo(() => models.map(m => ({
     id: m.instanceId,
     label: m.name,
-    icon: WidgetsIcon,              // **component** olarak veriyoruz
+    icon: WidgetsIcon,
     // children: (m.children || []).map(ch => ({
     //   id: ch.id.toString(),
     //   label: ch.name,
@@ -37,8 +37,9 @@ export default function SceneTree() {
       }}
       sx={{
         height: '100%',
-        '& .MuiTreeItem-label': { color: 'white' },
-        '& .Mui-selected > .MuiTreeItem-label': { fontWeight: 'bold' },
+        '& MuiTreeItem-content': { background: 'rgba(162, 83, 83, 0.2)' },
+        '& .MuiTreeItem-label': { color: 'white', fontSize: '13px' },
+        '& .Mui-selected > .MuiTreeItem-label': { fontWeight: 'bold', fontSize: '14px' },
       }}
     />
   )

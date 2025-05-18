@@ -59,10 +59,10 @@ export default function ConfigurationScene({ children }) {
         onUpdate={cam => cam.lookAt(...camTar)}
       />
 
-      <directionalLight position={[0, 5, 5]} intensity={5} />
-      <directionalLight position={[5, 5, 0]} intensity={5} />
-      <directionalLight position={[-5, 5, 0]} intensity={5} />
-      <directionalLight position={[0, 5, -5]} intensity={5} />
+      <directionalLight position={[0, 5, 5]} intensity={5} color={'white'} />
+      <directionalLight position={[5, 5, 0]} intensity={5} color={'white'} />
+      <directionalLight position={[-5, 5, 0]} intensity={5} color={'white'} />
+      <directionalLight position={[0, 5, -5]} intensity={5} color={'white'} />
 
       <SceneManager focusDuration={0.8} />
 
