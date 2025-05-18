@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 export const useModelsStorage = create((set, get) => ({
   // --- State ---
-  models: [],               // { id, name, path, instanceId, children: [], selected: bool }
+  models: [],               // her model: { id, name, path, instanceId, children, selected, position, rotation, scale }
   selectedId: null,         // seçili modelin instanceId’si
 
   // --- Selector ---
@@ -17,13 +17,17 @@ export const useModelsStorage = create((set, get) => ({
   addModel: (model, selectNew = false) => {
     const instanceId = uuidv4()
     set(state => {
-      // tüm eski seçimleri kaldır
+      // eskileri seçimsizleştir
       const cleared = state.models.map(m => ({ ...m, selected: false }))
       const newEntry = {
         ...model,
         instanceId,
-        children: [],       // başlangıçta alt öğe yok
-        selected: selectNew
+        children: [],
+        selected: selectNew,
+        // YENİ ALANLAR: default transform değerleri
+        position: [0, 0, 0],
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1],
       }
       return {
         models: [...cleared, newEntry],
@@ -55,7 +59,33 @@ export const useModelsStorage = create((set, get) => ({
   },
 
   setModels: (newModels) => {
-    set({ models: newModels.map(m => ({ ...m, selected: false })), selectedId: null })
+    set({
+      models: newModels.map(m => ({
+        ...m,
+        children: m.children || [],
+        selected: false,
+        position: m.position || [0, 0, 0],
+        rotation: m.rotation || [0, 0, 0],
+        scale: m.scale || [1, 1, 1],
+      })),
+      selectedId: null
+    })
+  },
+
+  // --- transform güncelleme ---
+  updateModelTransform: (instanceId, { position, rotation, scale }) => {
+    set(state => ({
+      models: state.models.map(m =>
+        m.instanceId === instanceId
+          ? {
+            ...m,
+            position: position ?? m.position,
+            rotation: rotation ?? m.rotation,
+            scale: scale ?? m.scale,
+          }
+          : m
+      )
+    }))
   },
 
   // --- Selection ---

@@ -1,6 +1,7 @@
 import { Box, Divider, Fade, Grid, Typography } from '@mui/material'
 import { useModelsStorage } from '@wi3n/core'
 import React, { useEffect, useState } from 'react'
+import PropertyEditor from './PropertyEditor'
 
 export const ModelInfoCard = () => {
   const { getSelectedModel } = useModelsStorage()
@@ -54,6 +55,7 @@ export const ModelInfoCard = () => {
           </Grid> */}
 
         </Grid>
+        <PropertyEditor />
       </Box>
     </Fade >
   )

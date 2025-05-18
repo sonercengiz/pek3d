@@ -19,49 +19,71 @@ export function SceneManager({ focusDuration = 1 }) {
     t: 1
   }).current
 
-  // imperatif model ekleme
+  // 1) İlk yükleme: modelleri imperatif ekle
   useEffect(() => {
     const loader = new GLTFLoader()
     models.forEach(m => {
       if (added.current.has(m.instanceId)) return
       added.current.add(m.instanceId)
+
       loader.load(m.path, gltf => {
         const root = gltf.scene.clone(true)
         root.name = m.instanceId
 
+        // temel materyaller
         root.traverse(obj => {
           if (obj.isMesh) {
             obj.material = new THREE.MeshStandardMaterial({
-              color: 0x333333,      // koyu gri
-              metalness: 0.6,
+              color: 'Darkgray',
+              metalness: 0,
               roughness: 0.8
             })
             obj.castShadow = true
-            obj.receiveShadow = true
+            obj.receiveShadow = false
           }
         })
 
-        // *** burası önemli ***
+        // işaretle
         root.userData = {
           isModelRoot: true,
           modelId: m.id,
           instanceId: m.instanceId,
-          modelName: m.name,
+          modelName: m.name
         }
+
+        // ** uygulanan başlangıç transformları **
+        root.position.set(...m.position)
+        root.rotation.set(...m.rotation)
+        root.scale.set(...m.scale)
 
         scene.add(root)
-        // eğer halihazırda seçili ise focus da hazırla
-        const ch = root.children?.map(c => ({ id: c.uuid, name: c.name || c.type }))
+
+        // children list update
+        const ch = root.children.map(c => ({ id: c.uuid, name: c.name || c.type }))
         updateModelChildren(m.instanceId, ch)
-        if (useModelsStorage.getState().selectedId === m.instanceId) {
-          startFocus(root)
-        }
+
+
+
+        // eğer zaten seçili ise odakla
+        if (selectedId === m.instanceId) startFocus(root)
       })
     })
-    console.log(1);
+  }, [models, scene, selectedId, updateModelChildren])
+
+  // 2) Store’da transformlar değişince sahneyi güncelle
+  useEffect(() => {
+    models.forEach(m => {
+      // sahnede bu instanceId ile group var mı?
+      const obj = scene.getObjectByName(m.instanceId)
+      if (obj) {
+        obj.position.set(...m.position)
+        obj.rotation.set(...m.rotation)
+        obj.scale.set(...m.scale)
+      }
+    })
   }, [models, scene])
 
-  // selectedId değiştiğinde focus başlat
+  // 3) Seçim değişince focus
   useEffect(() => {
     if (!selectedId) return
     const obj = scene.getObjectByName(selectedId)
@@ -69,37 +91,28 @@ export function SceneManager({ focusDuration = 1 }) {
   }, [selectedId, scene])
 
   function startFocus(obj) {
-    // 1) Model’in bounding sphere’ünü al
     const box = new THREE.Box3().setFromObject(obj)
     const sph = box.getBoundingSphere(new THREE.Sphere())
 
-    // 2) Mevcut kamera/hedef pozisyonunu sakla
     anim.startPos.copy(camera.position)
     anim.startTarget.copy(controls.target)
-
-    // 3) Yeni hedef noktayı model merkezine kaydır
     anim.endTarget.copy(sph.center)
 
-    // 4) Kameranın mevcut baktığı yönden birim vektör al
     const currentDir = new THREE.Vector3()
       .subVectors(camera.position, controls.target)
       .normalize()
 
-    // 5) Gerekli mesafeyi hesapla
     const fov = THREE.MathUtils.degToRad(camera.fov)
     const distance = sph.radius / Math.sin(fov / 2) * 1.2
 
-    // 6) Son kamera pozisyonunu, model merkezinden bu yönde uzaklaştırarak ayarla
     anim.endPos
       .copy(sph.center)
       .add(currentDir.multiplyScalar(distance))
 
-    // 7) Animasyon kronometresini başa sar
     anim.t = 0
   }
 
-
-  // frame’de interpolate
+  // 4) Yumuşak kamera animasyonu
   useFrame((_, delta) => {
     if (anim.t < 1) {
       anim.t = Math.min(1, anim.t + delta / focusDuration)

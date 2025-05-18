@@ -27,37 +27,40 @@ export default function SelectionHandler({ clearOnEmpty = true }) {
       const dx = event.clientX - downPos.current.x
       const dy = event.clientY - downPos.current.y
       const dist2 = dx * dx + dy * dy
-      const CLICK_THRESHOLD = 5 // px cinsinden izin verilen hareket miktarı
+      if (dist2 > 5 * 5) return  // drag, not click
 
-      if (dist2 > CLICK_THRESHOLD * CLICK_THRESHOLD) {
-        // sürükleme; ignore
-        return
-      }
-
-      // gerçek bir tıklama
-      // normalize mouse coords
+      // normalize coords
       const { left, top, width, height } = canvas.getBoundingClientRect()
       const x = ((event.clientX - left) / width) * 2 - 1
       const y = -((event.clientY - top) / height) * 2 + 1
 
-      // raycast
+      // raycast all scene children
       raycaster.current.setFromCamera({ x, y }, camera)
       const hits = raycaster.current.intersectObjects(scene.children, true)
-      if (hits.length > 0) {
-        // en üst mesh'ten modelRoot'a tırman
-        let obj = hits[0].object
+
+      // pick first model‐root hit
+      const hit = hits.find(h => {
+        let o = h.object
+        while (o) {
+          if (o.userData?.isModelRoot) return true
+          o = o.parent
+        }
+        return false
+      })
+
+      if (hit) {
+        let obj = hit.object
         while (obj && !obj.userData.isModelRoot) {
           obj = obj.parent
         }
-        if (obj && obj.userData.isModelRoot) {
-          select(obj.userData.instanceId || obj.name)
-          return
-        }
+        select(obj.userData.instanceId)
+        return
       }
 
-      // boş alana tıklanırsa
+      // otherwise clear
       if (clearOnEmpty) clearSelection()
     }
+
 
     canvas.addEventListener('mousedown', handleMouseDown)
     canvas.addEventListener('mouseup', handleMouseUp)
