@@ -4,23 +4,6 @@ import { useThree } from '@react-three/fiber'
 import { TransformControls } from '@react-three/drei'
 import { useModelsStorage } from '@wi3n/core'
 
-function findModelRoot(scene, instanceId) {
-  console.log('findModelRoot', instanceId)
-  console.log('scene children', scene.children)
-  console.log('find in scene', scene.getObjectByName(String(instanceId)))
-  // Hızlı name lookup
-  const byName = scene.getObjectByName(String(instanceId))
-  if (byName) return byName
-  // Yoksa brute‐force traverse
-  let found = null
-  scene.traverse(obj => {
-    if (!found && obj.userData?.instanceId === instanceId) {
-      found = obj
-    }
-  })
-  return found
-}
-
 export default function TransformEditor({ mode = 'translate' }) {
   const { scene, controls } = useThree()     // mevcut OrbitControls
   const transformRef = useRef()
@@ -28,10 +11,12 @@ export default function TransformEditor({ mode = 'translate' }) {
   const models = useModelsStorage(s => s.models)
   const updateTransform = useModelsStorage(s => s.updateModelTransform)
 
+
   // Sahnedeki objeye referans
   const selectedObject = useMemo(() => {
-    return selectedId ? findModelRoot(scene, selectedId) : null
-  }, [scene, selectedId, models.length])
+    if (selectedId == null) return null
+    return scene.getObjectByName(selectedId)
+  }, [scene, selectedId, models])
 
   // attach/detach
   useEffect(() => {
