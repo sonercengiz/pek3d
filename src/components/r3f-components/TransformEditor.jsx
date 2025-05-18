@@ -11,7 +11,6 @@ export default function TransformEditor({ mode = 'translate' }) {
   const models = useModelsStorage(s => s.models)
   const updateTransform = useModelsStorage(s => s.updateModelTransform)
 
-
   // Sahnedeki objeye referans
   const selectedObject = useMemo(() => {
     if (selectedId == null) return null
@@ -56,6 +55,9 @@ export default function TransformEditor({ mode = 'translate' }) {
   return (
     <TransformControls
       ref={transformRef}
+      scaleSnap={0.1}
+      rotationSnap={Math.PI / 180 * 5}
+      translationSnap={0.1}
       mode={mode}
     />
   )

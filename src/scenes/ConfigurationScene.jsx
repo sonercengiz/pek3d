@@ -60,10 +60,10 @@ export default function ConfigurationScene({ children }) {
         onUpdate={cam => cam.lookAt(...camTar)}
       />
 
-      <directionalLight position={[0, 5, 5]} intensity={5} color={'lightblue'} />
-      <directionalLight position={[5, 5, 0]} intensity={5} color={'lightblue'} />
-      <directionalLight position={[-5, 5, 0]} intensity={5} color={'lightblue'} />
-      <directionalLight position={[0, 5, -5]} intensity={5} color={'lightblue'} />
+      <directionalLight position={[0, 5, 5]} intensity={1} color={'white'} />
+      <directionalLight position={[5, 5, 0]} intensity={1} color={'white'} />
+      <directionalLight position={[-5, 5, 0]} intensity={1} color={'white'} />
+      <directionalLight position={[0, 5, -5]} intensity={1} color={'white'} />
 
       <SceneManager focusDuration={0.8} />
       <TransformEditor mode='translate' />
@@ -91,9 +91,9 @@ export default function ConfigurationScene({ children }) {
 
       {/* <Floor /> */}
 
-      <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 0.01, 0]} gridColor="black" textColor='black' />
-      <GridWithLabels size={5} divisions={5} fontSize={0.3} position={[0, 2.01, 0]} gridColor="black" textColor='black' />
-
+      <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 0, 0]} gridColor="black" textColor='black' />
+      <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 4.5, 0]} gridColor="black" textColor='black' />
+      <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 9, 0]} gridColor="black" textColor='black' />
       <GizmoHelper alignment="bottom-right" margin={[80, 80]}><GizmoViewport /></GizmoHelper>
     </Canvas>
   )
