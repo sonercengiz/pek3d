@@ -1,8 +1,8 @@
-// src/components/r3f-components/TransformEditor.jsx
-import React, { useRef, useEffect, useMemo } from 'react'
+import React, { useRef, useEffect, useMemo, useCallback } from 'react'
 import { useThree } from '@react-three/fiber'
 import { TransformControls } from '@react-three/drei'
 import { useModelsStorage } from '@wi3n/core'
+import { throttle } from 'lodash'
 
 export default function TransformEditor({ mode = 'translate' }) {
   const { scene, controls } = useThree()
@@ -11,58 +11,50 @@ export default function TransformEditor({ mode = 'translate' }) {
   const models = useModelsStorage(s => s.models)
   const updateTransform = useModelsStorage(s => s.updateModelTransform)
 
-  // Seçili objeyi sahneden al
+  // Seçili obje referansı
   const selectedObject = useMemo(() => {
     return selectedId != null
       ? scene.getObjectByName(selectedId)
       : null
   }, [scene, selectedId, models])
 
-  // Attach/detach ve objectChange listener’ını tek useEffect’te yönetin
+  // Tek seferlik attach/detach
   useEffect(() => {
     const tc = transformRef.current
     if (!tc) return
 
-    // 1) Attach veya detach
-    if (selectedObject) {
-      tc.attach(selectedObject)
-    } else {
-      tc.detach()
-    }
-
-    // 2) Transform değiştiğinde state’i güncelle
-    const handleObjectChange = () => {
-      const obj = tc.object
-      if (!selectedId || !obj) return
-      updateTransform(selectedId, {
-        position: [obj.position.x, obj.position.y, obj.position.z],
-        rotation: [obj.rotation.x, obj.rotation.y, obj.rotation.z],
-        scale: [obj.scale.x, obj.scale.y, obj.scale.z],
-      })
-    }
-    tc.addEventListener('objectChange', handleObjectChange)
+    if (selectedObject) tc.attach(selectedObject)
+    else tc.detach()
 
     return () => {
-      tc.removeEventListener('objectChange', handleObjectChange)
-      if (!selectedObject) {
-        tc.detach()
-      }
+      if (tc) tc.detach()
     }
-  }, [selectedObject, selectedId, updateTransform])
+  }, [selectedObject])
 
-  // Drag sırasında OrbitControls’u devre dışı bırak
+  // Sürükleme değişimini dinle: drag başladığında OrbitControls’u kapat, bittiğinde store’a tek güncelleme
   useEffect(() => {
     const tc = transformRef.current
     if (!tc || !controls) return
 
-    const handleDragging = ({ value }) => {
+    const onDraggingChanged = ({ value }) => {
       controls.enabled = !value
+
+      // sürükleme bittiğinde bir kere güncelle
+      if (!value && tc.object && selectedId) {
+        const o = tc.object
+        updateTransform(selectedId, {
+          position: [o.position.x, o.position.y, o.position.z],
+          rotation: [o.rotation.x, o.rotation.y, o.rotation.z],
+          scale: [o.scale.x, o.scale.y, o.scale.z],
+        })
+      }
     }
-    tc.addEventListener('dragging-changed', handleDragging)
+
+    tc.addEventListener('dragging-changed', onDraggingChanged)
     return () => {
-      tc.removeEventListener('dragging-changed', handleDragging)
+      tc.removeEventListener('dragging-changed', onDraggingChanged)
     }
-  }, [controls])
+  }, [controls, selectedId, updateTransform])
 
   if (!selectedObject) return null
 
