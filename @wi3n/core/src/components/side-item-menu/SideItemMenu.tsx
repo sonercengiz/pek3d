@@ -2,15 +2,26 @@
 import React, { FC, useState, ReactNode } from 'react'
 import { Box, Tab } from '@mui/material'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
-import { styled } from '@mui/material/styles'
-
+import { styled, SxProps, Theme } from '@mui/material/styles'
 export interface MenuContent {
   title: string
   content: ReactNode
 }
 
+export type Placement =
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right'
+  | 'top-center'
+  | 'bottom-center'
+
 interface SideItemMenuProps {
   menuContents: MenuContent[]
+  width?: number | string
+  height?: number | string
+  placement?: Placement
+  sx?: SxProps<Theme>
 }
 
 const CustomTab = styled(Tab)(({ theme }) => ({
@@ -28,55 +39,53 @@ const CustomTab = styled(Tab)(({ theme }) => ({
   },
 }))
 
-const SideItemMenu: FC<SideItemMenuProps> = ({ menuContents }) => {
-  // string olarak tutuyoruz çünkü TabContext value string ister
+const placementMap: Record<Placement, SxProps<Theme>> = {
+  'top-left': { top: 0, left: 0, transform: 'none' },
+  'top-right': { top: 0, right: 0, transform: 'none' },
+  'bottom-left': { bottom: 0, left: 0, transform: 'none' },
+  'bottom-right': { bottom: 0, right: 0, transform: 'none' },
+  'top-center': { top: 0, left: '50%', transform: 'translateX(-50%)' },
+  'bottom-center': { bottom: 0, left: '50%', transform: 'translateX(-50%)' },
+}
+
+const SideItemMenu: FC<SideItemMenuProps> = ({
+  menuContents,
+  width = 220,
+  height = '96vh',
+  placement,
+  sx,
+}) => {
   const [value, setValue] = useState<string>('0')
+  const single = menuContents.length === 1
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue)
+    if (!single) setValue(newValue)
   }
 
-  // sekme sayısına göre variant seçimi
-  const tabsVariant = menuContents.length > 2 ? 'scrollable' : 'fullWidth'
+  const placementSx = placement ? placementMap[placement] : {}
 
   return (
     <Box
       sx={{
         position: 'absolute',
-        top: 0,
-        left: 0,
         m: 2,
         zIndex: 1,
-        width: 220,
         bgcolor: '#000000CC',
         borderRadius: 4,
         display: 'flex',
         flexDirection: 'column',
-        height: '96vh',
+        width,
+        height,
+        ...placementSx,
+        ...sx,
       }}
     >
       <TabContext value={value}>
         <TabList
           onChange={handleTabChange}
-          variant={tabsVariant}
-          scrollButtons={'auto'}
-          allowScrollButtonsMobile
-
-          slotProps={{
-            startScrollButtonIcon: {
-              sx: {
-                color: '#fff',          // sola kayan ikon (←) rengi
-                fontSize: '1rem'
-              }
-            },
-            endScrollButtonIcon: {
-              sx: {
-                color: '#fff',          // sağa kayan ikon (→) rengi
-                fontSize: '1rem'
-              }
-            }
-          }}
-
+          variant={single ? 'fullWidth' : menuContents.length > 2 ? 'scrollable' : 'fullWidth'}
+          scrollButtons={single ? false : 'auto'}
+          allowScrollButtonsMobile={!single}
           sx={{
             p: 1,
             '& .MuiTabs-indicator': {
@@ -91,20 +100,19 @@ const SideItemMenu: FC<SideItemMenuProps> = ({ menuContents }) => {
               key={idx}
               label={menu.title}
               value={idx.toString()}
-              sx={{
-                m: 0,
-              }}
+              sx={{ m: 0, ...(single && { pointerEvents: 'none' }) }}
             />
           ))}
         </TabList>
 
-        {/* İçerikler */}
         {menuContents.map((menu, idx) => (
           <TabPanel
             key={idx}
             value={idx.toString()}
             sx={{
-              flex: 1, p: 0, overflowY: 'auto',
+              flex: 1,
+              p: 0,
+              overflowY: 'auto',
               userSelect: 'none',
               scrollbarWidth: 'none',
             }}

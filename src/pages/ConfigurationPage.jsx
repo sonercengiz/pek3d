@@ -12,7 +12,7 @@ const ConfigurationPage = () => {
             <ConfigurationScene >
 
             </ConfigurationScene>
-            <SideMenu />
+            <SideMenu placement="top-left" />
             <TopToolbar />
             <ModelInfoCard />
             {/* <SceneSettingsMenu/> */}

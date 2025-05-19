@@ -10,7 +10,11 @@ const menuContents = [
 ]
 const SideMenu = () => {
   return (
-    <SideItemMenu menuContents={menuContents} />
+    <>
+      <SideItemMenu menuContents={menuContents} placement='top-left' height={'47vh'} width={200} />
+      <SideItemMenu menuContents={menuContents} placement='bottom-left' height={'47vh'} width={200} />
+    </>
+
   )
 }
 
