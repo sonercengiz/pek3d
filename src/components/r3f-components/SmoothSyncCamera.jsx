@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { useCameraStorage } from '@wi3n/core'
+import { useCameraStorage } from 'wi3n-core'
 
 export default function SmoothSyncCamera({ duration = 0.8 }) {
   // Store’daki hedef değerler

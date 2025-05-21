@@ -4,7 +4,7 @@ import { RichTreeView } from '@mui/x-tree-view'
 import WidgetsIcon from '@mui/icons-material/Widgets'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useModelsStorage } from '@wi3n/core'
+import { useModelsStorage } from 'wi3n-core'
 
 export default function SceneTree() {
   const models = useModelsStorage(s => s.models)

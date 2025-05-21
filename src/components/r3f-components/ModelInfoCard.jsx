@@ -7,7 +7,9 @@ import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import { useModelsStorage } from '@wi3n/core'
+import { useModelsStorage } from 'wi3n-core'
+import { Checkbox, FormControlLabel, Tab, Tabs } from '@mui/material'
+import { useSettingsStorage } from '../../storage/SceneStorage'
 
 // Tekrar render’ı önlemek için memoize edilmiş input bileşeni
 const AxisInput = React.memo(({ prop, idx }) => {
@@ -107,27 +109,48 @@ const AxisInput = React.memo(({ prop, idx }) => {
 
 
 export const ModelInfoCard = () => {
+  // 1. Hooks en üstte
+  const [tab, setTab] = React.useState(0)
   const model = useModelsStorage(s => s.getSelectedModel())
+  const updateProp = useModelsStorage(s => s.updateModelProp)
+  const { setTransformEditorType } = useSettingsStorage()
+
   if (!model) return null
+
+  // model.showWireframe ön tanımlı true
+  const { showWireframe = true } = model
+
+  const handleTab = (_e, v) => {
+    setTab(v)
+    alert(c)
+    switch (v) {
+      case 0: // position
+        setTransformEditorType('translate')
+        break
+      case 1: // rotation
+        setTransformEditorType('rotation')
+        break
+      case 2: // scale
+        setTransformEditorType('scale')
+        break
+      default:
+        setTransformEditorType('translate')
+        break
+    }
+
+  }
 
   return (
     <Fade in timeout={300}>
       <Box
         sx={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          zIndex: 10,
-          width: 240,
-          bgcolor: 'rgba(0,0,0,0.8)',
-          m: 2,
-          p: 2,
-          borderRadius: 2,
-          color: '#E8E8E8',
+          position: 'absolute', top: 0, right: 0, zIndex: 10,
+          width: 240, bgcolor: 'rgba(0,0,0,0.8)',
+          m: 2, p: 2, borderRadius: 2, color: '#E8E8E8'
         }}
       >
         <Typography variant="h6" align="center" gutterBottom>
-          Model Info
+          {model.name}
         </Typography>
         <Divider sx={{ background: '#555', mb: 2 }} />
 
@@ -141,22 +164,84 @@ export const ModelInfoCard = () => {
           <strong>Name:</strong> {model.name}
         </Typography>
 
-        <Divider sx={{ background: '#555', my: 2 }} />
+        <Divider sx={{ background: '#555', mt: 1 }} />
 
-        {['position', 'rotation', 'scale'].map(prop => (
-          <Box key={prop} sx={{ mb: 1 }}>
-            <Typography variant="caption" fontWeight={"bold"} sx={{ mb: 0.5 }}>
-              {prop.charAt(0).toUpperCase() + prop.slice(1)}
+        {/* 2. Sekmeler */}
+        <Tabs
+          value={tab}
+          onChange={handleTab}
+          variant="standard"           // or omit variant to use 'standard'
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+          textColor="inherit"
+          indicatorColor="secondary"
+          sx={{
+            // globally override each Tab
+            '& .MuiTab-root': {
+              minWidth: 'auto',          // don't enforce 120px default
+              // px: 1,                     // small horizontal padding
+              fontSize: '12px',
+              p: 0,
+              mx: 1,
+            }
+          }}
+        >
+          <Tab label="Position" value={0} />
+          <Tab label="Rotation" value={1} />
+          <Tab label="Scale" value={2} />
+        </Tabs>
+
+        {/* 3. Paneller */}
+        {tab === 0 && (
+          <Grid container spacing={1} >
+            {model.position.map((_, i) => (
+              <Grid item size={4} key={i}>
+                <AxisInput prop="position" idx={i} />
+              </Grid>
+            ))}
+          </Grid>
+        )}
+        {tab === 1 && (
+          <Grid container spacing={1}>
+            {model.rotation.map((_, i) => (
+              <Grid item size={4} key={i}>
+                <AxisInput prop="rotation" idx={i} />
+              </Grid>
+            ))}
+          </Grid>
+        )}
+        {tab === 2 && (
+          <Grid container spacing={1}>
+            {model.scale.map((_, i) => (
+              <Grid item size={4} key={i}>
+                <AxisInput prop="scale" idx={i} />
+              </Grid>
+            ))}
+          </Grid>
+        )}
+        <Divider sx={{ background: '#555', mt: 1 }} />
+        {/* wireframe toggle */}
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showWireframe}
+              onChange={e =>
+                updateProp(model.instanceId, { showWireframe: e.target.checked })
+              }
+              size="small"
+              sx={{
+                color: '#E8E8E8',
+                '&.Mui-checked': { color: '#E8E8E8' }
+              }}
+            />
+          }
+          label={
+            <Typography variant="caption" sx={{ color: '#E8E8E8' }}>
+              Show Wireframe
             </Typography>
-            <Grid container spacing={1}>
-              {model[prop].map((_, idx) => (
-                <Grid item size={{ xs: 4, md: 4 }} key={idx}>
-                  <AxisInput prop={prop} idx={idx} />
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        ))}
+          }
+          sx={{ mb: 2 }}
+        />
       </Box>
     </Fade>
   )

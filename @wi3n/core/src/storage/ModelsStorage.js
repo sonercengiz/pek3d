@@ -24,7 +24,7 @@ export const useModelsStorage = create((set, get) => ({
         instanceId,
         children: [],
         selected: selectNew,
-        // YENİ ALANLAR: default transform değerleri
+        showWireframe: false,
         position: [0, 0, 0],
         rotation: [0, 0, 0],
         scale: [1, 1, 1],
@@ -35,6 +35,16 @@ export const useModelsStorage = create((set, get) => ({
       }
     })
     return instanceId
+  },
+
+  updateModelProp: (instanceId, props) => {
+    set(state => ({
+      models: state.models.map(m =>
+        m.instanceId === instanceId
+          ? { ...m, ...props }
+          : m
+      )
+    }))
   },
 
   updateModelChildren: (instanceId, children) => {
@@ -64,6 +74,7 @@ export const useModelsStorage = create((set, get) => ({
         ...m,
         children: m.children || [],
         selected: false,
+        showWireframe: false,
         position: m.position || [0, 0, 0],
         rotation: m.rotation || [0, 0, 0],
         scale: m.scale || [1, 1, 1],

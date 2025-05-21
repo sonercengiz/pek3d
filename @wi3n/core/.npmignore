@@ -1,0 +1,20 @@
+# Geliştirme dosyaları
+src/
+tsconfig.json
+rollup.config.mjs
+
+# Build dışı node_modules
+node_modules/
+
+# Testler
+*.test.*
+__tests__/
+
+# Config dosyaları
+.vscode/
+.eslintrc*
+.prettierrc*
+*.log
+
+# Root lock dosyası (gerekirse dışlanabilir)
+package-lock.json

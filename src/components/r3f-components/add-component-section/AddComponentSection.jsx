@@ -8,7 +8,7 @@ import {
   CircularProgress,
   TextField
 } from '@mui/material'
-import { PreviewModelProvider, PreviewModel, useModelsStorage } from '@wi3n/core'
+import { PreviewModelProvider, PreviewModel, useModelsStorage } from 'wi3n-core'
 import {
   boxContainer,
   searchField,

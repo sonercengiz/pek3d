@@ -1,6 +1,6 @@
 // src/components/r3f-components/PropertyEditor.jsx
 import React from 'react'
-import { useModelsStorage } from '@wi3n/core'
+import { useModelsStorage } from 'wi3n-core'
 
 export default function PropertyEditor() {
   const selectedId = useModelsStorage(s => s.selectedId)

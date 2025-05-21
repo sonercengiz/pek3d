@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import * as THREE from 'three'
-import { useModelsStorage } from '@wi3n/core'
+import { useModelsStorage } from 'wi3n-core'
 
 export function SceneManager({ focusDuration = 1 }) {
   const { models, updateModelChildren, selectedId } = useModelsStorage()
@@ -31,17 +31,17 @@ export function SceneManager({ focusDuration = 1 }) {
         root.name = m.instanceId
 
         // temel materyaller
-        root.traverse(obj => {
-          if (obj.isMesh) {
-            obj.material = new THREE.MeshStandardMaterial({
-              color: 'Darkgray',
-              metalness: 0,
-              roughness: 0.8
-            })
-            obj.castShadow = true
-            obj.receiveShadow = false
-          }
-        })
+        // root.traverse(obj => {
+        //   if (obj.isMesh) {
+        //     obj.material = new THREE.MeshStandardMaterial({
+        //       color: 'Darkgray',
+        //       metalness: 0,
+        //       roughness: 0.8
+        //     })
+        //     obj.castShadow = true
+        //     obj.receiveShadow = false
+        //   }
+        // })
 
         // işaretle
         root.userData = {

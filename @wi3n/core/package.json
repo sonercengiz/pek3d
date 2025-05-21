@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "@wi3n/core",
+  "name": "wi3n-core",
   "version": "0.1.0",
   "private": false,
   "main": "dist/index.cjs.js",

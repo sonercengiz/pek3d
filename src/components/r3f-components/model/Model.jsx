@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
-import { useModelsStorage } from '@wi3n/core'
+import { useModelsStorage } from 'wi3n-core'
 
 export default function Model({ id, path, ...props }) {
   const { scene } = useGLTF(path)

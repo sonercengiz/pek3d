@@ -2,6 +2,7 @@
 
 // Components
 export { default as CubeGridWithLabels } from './components/cube-grid-with-labels'
+export { default as Floor } from './components/floor'
 export { default as GridWithLabels } from './components/grid-with-labels'
 export { default as SideItemMenu } from './components/side-item-menu'
 export { default as Toolbar } from './components/toolbar/Toolbar'

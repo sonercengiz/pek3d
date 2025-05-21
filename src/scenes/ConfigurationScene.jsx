@@ -9,14 +9,17 @@ import {
   PerspectiveCamera,
   Stats
 } from '@react-three/drei'
-import { GridWithLabels, useModelsStorage } from '@wi3n/core'
-import { useCameraStorage, useControlsStorage, useEnvironmentStorage, useHistoryStorage } from '@wi3n/core'
+import { GridWithLabels, useModelsStorage } from 'wi3n-core'
+import { useCameraStorage, useControlsStorage, useEnvironmentStorage, useHistoryStorage } from 'wi3n-core'
 import SmoothSyncCamera from '../components/r3f-components/SmoothSyncCamera'
 import { SceneManager } from '../components/r3f-components/SceneManager'
 import SelectionHandler from '../components/r3f-components/SelectionHandler'
 import SelectedHighlighter from '../components/r3f-components/SelectedHighlighter'
-import { Floor } from '../components/r3f-components/Floor'
+import { Floor } from 'wi3n-core'
 import TransformEditor from '../components/r3f-components/TransformEditor'
+import { useSettingsStorage } from '../storage/SceneStorage'
+import SnapPoints from '../components/r3f-components/SnapPoints'
+import SnapController from '../components/r3f-components/SnapController'
 
 export default function ConfigurationScene({ children }) {
   // initial camera
@@ -47,9 +50,12 @@ export default function ConfigurationScene({ children }) {
   const undo = useHistoryStorage(s => s.undo)
   const redo = useHistoryStorage(s => s.redo)
 
+  // settings
+  const { mode, transformEditorType } = useSettingsStorage()
+
   return (
-    <Canvas performance={{ min: 0.1, max: 0.5 }} shadows>
-      <Stats />
+    <Canvas shadows>
+      {/* <Stats /> */}
       <color attach="background" args={[bgColor]} />
       {fogOn && <fog attach="fog" args={[fogColor, fogNear, fogFar]} />}
 
@@ -66,7 +72,10 @@ export default function ConfigurationScene({ children }) {
       <directionalLight position={[0, 5, -5]} intensity={1} color={'white'} />
 
       <SceneManager focusDuration={0.8} />
-      <TransformEditor mode='translate' />
+      {mode === 'selection' && <TransformEditor mode={transformEditorType} />}
+
+      {mode === 'snap' && <SnapPoints />}
+      {mode === 'snap' && <SnapController />}
 
       <OrbitControls
         makeDefault
@@ -83,17 +92,15 @@ export default function ConfigurationScene({ children }) {
       {/* her seçime veya reset’e smooth */}
       <SmoothSyncCamera duration={0.8} />
 
-      <SelectionHandler />
+      {mode === 'selection' && <SelectionHandler />}
       <SelectedHighlighter />
 
 
       {children}
 
-      {/* <Floor /> */}
+      <Floor fontSize={0.3} />
 
-      <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 0, 0]} gridColor="black" textColor='black' />
-      <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 4.5, 0]} gridColor="black" textColor='black' />
-      <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 9, 0]} gridColor="black" textColor='black' />
+      {/* <GridWithLabels size={20} divisions={20} fontSize={0.3} position={[0, 0, 0]} gridColor="black" textColor='black' /> */}
       <GizmoHelper alignment="bottom-right" margin={[80, 80]}><GizmoViewport /></GizmoHelper>
     </Canvas>
   )

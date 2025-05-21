@@ -1,8 +1,10 @@
-// SideItemMenu.tsx
+// src/components/r3f-components/SideItemMenu.tsx
 import React, { FC, useState, ReactNode } from 'react'
-import { Box, Tab } from '@mui/material'
+import Box from '@mui/material/Box'
+import Tab from '@mui/material/Tab'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import { styled, SxProps, Theme } from '@mui/material/styles'
+
 export interface MenuContent {
   title: string
   content: ReactNode
@@ -37,6 +39,12 @@ const CustomTab = styled(Tab)(({ theme }) => ({
     backgroundColor: '#FFFFFF1A',
     color: '#FFF',
   },
+  '&.Mui-disabled': {
+    opacity: 1,
+    cursor: 'default',
+    backgroundColor: 'transparent',
+    color: '#555',
+  },
 }))
 
 const placementMap: Record<Placement, SxProps<Theme>> = {
@@ -55,7 +63,7 @@ const SideItemMenu: FC<SideItemMenuProps> = ({
   placement,
   sx,
 }) => {
-  const [value, setValue] = useState<string>('0')
+  const [value, setValue] = useState('0')
   const single = menuContents.length === 1
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
@@ -66,19 +74,21 @@ const SideItemMenu: FC<SideItemMenuProps> = ({
 
   return (
     <Box
-      sx={{
-        position: 'absolute',
-        m: 2,
-        zIndex: 1,
-        bgcolor: '#000000CC',
-        borderRadius: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        width,
-        height,
-        ...placementSx,
-        ...sx,
-      }}
+      sx={[
+        {
+          position: 'absolute',
+          m: 2,
+          zIndex: 1,
+          bgcolor: '#000000CC',
+          borderRadius: 4,
+          display: 'flex',
+          flexDirection: 'column',
+          width,
+          height,
+        },
+        placementSx,
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
     >
       <TabContext value={value}>
         <TabList
@@ -100,7 +110,7 @@ const SideItemMenu: FC<SideItemMenuProps> = ({
               key={idx}
               label={menu.title}
               value={idx.toString()}
-              sx={{ m: 0, ...(single && { pointerEvents: 'none' }) }}
+              sx={single ? { pointerEvents: 'none' } : undefined}
             />
           ))}
         </TabList>
