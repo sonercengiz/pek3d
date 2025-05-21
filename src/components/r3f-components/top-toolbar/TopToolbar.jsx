@@ -26,17 +26,17 @@ export default function TopToolbar() {
 
   const items = [
     { id: 'add-component', icon: <AddIcon />, onClick: () => setOpenAdd(true) },
-    {
-      id: 'reset-camera',
-      icon: <CameraOutdoorIcon />,
-      onClick: () => {
-        // store’a gerçekten yeni değerler yazar
-        setPos(initialPos)
-        setTar(initialTar)
-        setZoom(initialZoom)
-        clearSel()
-      }
-    },
+    // {
+    //   id: 'reset-camera',
+    //   icon: <CameraOutdoorIcon />,
+    //   onClick: () => {
+    //     // store’a gerçekten yeni değerler yazar
+    //     setPos(initialPos)
+    //     setTar(initialTar)
+    //     setZoom(initialZoom)
+    //     clearSel()
+    //   }
+    // },
     { id: 'settings', icon: <SettingsIcon />, onClick: () => setOpenSettings(true) },
   ]
 

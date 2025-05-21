@@ -3,6 +3,7 @@ import { useThree } from '@react-three/fiber'
 import { TransformControls } from '@react-three/drei'
 import { useModelsStorage } from 'wi3n-core'
 import throttle from 'lodash/throttle'
+import { useSettingsStorage } from '../../storage/SceneStorage'
 
 // Utility to round numbers to desired precision
 const round = (num, decimals = 2) => parseFloat(num.toFixed(decimals))
@@ -13,6 +14,7 @@ export default function TransformEditor({ mode = 'translate' }) {
   const selectedId = useModelsStorage(s => s.selectedId)
   const models = useModelsStorage(s => s.models)
   const updateTransform = useModelsStorage(s => s.updateModelTransform)
+  const { transformEditorType } = useSettingsStorage()
 
   // Get the selected object from the scene
   const selectedObject = useMemo(() => (

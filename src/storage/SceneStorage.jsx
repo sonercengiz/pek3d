@@ -6,7 +6,7 @@ export const useSettingsStorage = create((set, get) => ({
   setMode: (mode) => set({ mode }),
 
   transformEditorType: 'translate',
-  setTransformEditorType: (type) => set({ type }),
+  setTransformEditorType: (type) => set(state => ({ transformEditorType: type })),
 
   floor: [],
   addFloor: (size) => set(),

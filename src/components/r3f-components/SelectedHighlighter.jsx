@@ -16,12 +16,21 @@ export default function SelectedHighlighter() {
       root.traverse(o => {
         if (!o.isMesh || !o.material) return
 
-        // Model bazlı wireframe gösterimi
-        o.material.wireframe = !!m.showWireframe
+        // Eğer bir model seçiliyse:
+        // - Seçili model kendi showWireframe state'ine göre kalsın
+        // - Diğer tüm modellerin wireframe'i açılı olsun
+        // Eğer hiçbir model seçili değilse, tüm wireframe'ler state'e göre olsun
+        if (selectedId) {
+          o.material.wireframe = m.instanceId === selectedId
+            ? m.showWireframe
+            : true
+        } else {
+          o.material.wireframe = m.showWireframe
+        }
 
         // Seçili model materyal rengi yeşil, diğerler koyu gri
-        const baseColor = m.instanceId === selectedId ? 'lightgreen' : 'darkgray'
-        o.material.color = new THREE.Color(baseColor)
+        // const baseColor = m.instanceId === selectedId ? 'lightgreen' : 'darkgray'
+        // o.material.color = new THREE.Color(baseColor)
 
         o.material.needsUpdate = true
       })

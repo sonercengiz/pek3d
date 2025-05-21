@@ -6,7 +6,7 @@ import * as THREE from 'three'
 import { useModelsStorage } from 'wi3n-core'
 
 export function SceneManager({ focusDuration = 1 }) {
-  const { models, updateModelChildren, selectedId } = useModelsStorage()
+  const { models, updateModelChildren, selectedId, updateModelTransform } = useModelsStorage()
   const { scene, camera } = useThree()
   const controls = useThree(state => state.controls)
 
@@ -51,8 +51,28 @@ export function SceneManager({ focusDuration = 1 }) {
           modelName: m.name
         }
 
-        // ** uygulanan başlangıç transformları **
-        root.position.set(...m.position)
+        // --- collisionCount’u state’ten oku ---
+        const { models: currentModels } = useModelsStorage.getState()
+        const [origX, , origZ] = m.position
+        const EPS = 1e-3
+        const collisionCount = currentModels.filter(m2 =>
+          Math.abs(m2.position[0] - origX) < EPS &&
+          Math.abs(m2.position[2] - origZ) < EPS
+        ).length
+
+        // offset adımı
+        const step = 1
+        const newX = origX + (collisionCount - 1) * step  // collisionCount-1: kendisi hariç
+        const newY = 0
+        const newZ = origZ
+
+        // state’i güncelle
+        updateModelTransform(m.instanceId, {
+          position: [newX, newY, newZ]
+        })
+
+        // sahneye uygula
+        root.position.set(newX, newY, newZ)
         root.rotation.set(...m.rotation)
         root.scale.set(...m.scale)
 

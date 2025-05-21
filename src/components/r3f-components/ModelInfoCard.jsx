@@ -122,13 +122,13 @@ export const ModelInfoCard = () => {
 
   const handleTab = (_e, v) => {
     setTab(v)
-    alert(c)
+    console.log(v)
     switch (v) {
       case 0: // position
         setTransformEditorType('translate')
         break
       case 1: // rotation
-        setTransformEditorType('rotation')
+        setTransformEditorType('rotate')
         break
       case 2: // scale
         setTransformEditorType('scale')
