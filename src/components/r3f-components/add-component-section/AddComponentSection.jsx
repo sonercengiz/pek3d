@@ -20,22 +20,53 @@ import { getComponentList } from '../../../services/ComponentService'
 import { MODELS_BASE_PATH } from '../../../utils/api'
 
 const AddComponentSection = ({ onClose }) => {
-  const [components, setComponents] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [components, setComponents] = useState([
+    {
+      id: 1,
+      name: '1,2 Mal Verme Bandı',
+      path: '/models/1-2-mal-verme-bandi.glb'
+    },
+    {
+      id: 2,
+      name: '1,2 Rotatif',
+      path: 'models/1-2-rotatif.glb'
+    },
+    {
+      id: 3,
+      name: '300 kg Mikser',
+      path: 'models/300-kg-mikser.glb'
+    },
+    {
+      id: 4,
+      name: 'Hamur Giyotin',
+      path: 'models/hamur-giyotin.glb'
+    },
+    {
+      id: 5,
+      name: 'Iskarta Değirmeni',
+      path: 'models/iskarta-degirmeni.glb'
+    },
+    {
+      id: 6,
+      name: 'Yerden Hamur Besleme Sistemi',
+      path: 'models/yerden-hamur-besleme-sistemi.glb'
+    },
+  ])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(false)
   const { addModel } = useModelsStorage()
 
-  useEffect(() => {
-    getComponentList()
-      .then(res => {
-        setComponents(res.data)
-        setIsLoading(false)
-      })
-      .catch(err => {
-        setError(err)
-        setIsLoading(false)
-      })
-  }, [])
+  // useEffect(() => {
+  //   getComponentList()
+  //     .then(res => {
+  //       setComponents(res.data)
+  //       setIsLoading(false)
+  //     })
+  //     .catch(err => {
+  //       setError(err)
+  //       setIsLoading(false)
+  //     })
+  // }, [])
 
   const handleClick = (id) => {
     const component = components.find(c => c.id === id)
@@ -47,7 +78,7 @@ const AddComponentSection = ({ onClose }) => {
     const componentModel = {
       id: component.id,
       name: component.name,
-      path: `${MODELS_BASE_PATH}${component.path}`,
+      path: `${component.path}`,
     }
 
     addModel(componentModel, true)
@@ -82,7 +113,8 @@ const AddComponentSection = ({ onClose }) => {
                 >
                   <Paper sx={paperCard}>
                     <PreviewModel
-                      modelPath={`${MODELS_BASE_PATH}${c.path}`}
+                      // modelPath={`${MODELS_BASE_PATH}${c.path}`}
+                      modelPath={`${c.path}`}
                       position={[0, 0, 0]}
                       width={160}
                       height={160}
